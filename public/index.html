@@ -16,6 +16,7 @@
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         let images = [];
+        let num = 1;
         /*
         const img = new Image();
         const img2 = new Image();
@@ -31,6 +32,7 @@
           const pixelData = imageData.data;
           const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
           const circles = [];
+          const lines = [];
           const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
           for (let i = 0; i < pixelCount; i++) {
               const R = pixelData[i * 4]; // Red value of pixel i
@@ -43,12 +45,15 @@
               const y = Math.floor(i / canvas.width); // Calculate y position of circle
               const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
               circles.push(circle);
+              const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
+              lines.push(line);
           }
 
-          
-          // Create SVG container and add circles
-          const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
 
+          // Create SVG container and add circles
+
+          const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
+/*
           svg.selectAll('circle').data(circles).enter().append('circle')
               .attr('cx', d => d.x)
               .attr('cy', d => d.y)
@@ -57,7 +62,16 @@
               .style('fill', '#ff000000')
               .attr("stroke-width", 1);
               //.attr('fill', d => `rgb(${pixelData[d.y * canvas.width * 4 + d.x * 4]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 1]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 2]})`);
-
+          */
+          svg.selectAll('line').data(lines).enter().append('line')
+              .attr('x1', d => d.x + d.bid)
+              .attr('y1', d => d.y)
+              .attr('x2', d => d.x + d.diameter - d.bid)
+              .attr('y2', d => d.y + d.diameter)
+              .style('stroke', this.colorStroke)
+              .style('fill', '#ff000000')
+              .attr("stroke-width", 1);
+          
           d3.select('body').append('img');
         };
 
@@ -68,6 +82,8 @@
           images[sName].onload = onload;
           images[sName].src = sFile;
           images[sName].range = aRange || [0,20];
+          images[sName].bid = num++;
+          //console.log(images);
         }
 
         //img.onload = onload;
@@ -81,9 +97,10 @@
         const url = "/img/" + filename;
 
         //img.src = url;
-        svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
+        //svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
         svgImage('base', 'red', 10, url, [0,20]);
-        svgImage('tui', 'gold', 10, "/img/rip2.jpg", [0,20]);
+        svgImage('tui', 'cyan', 10, "/img/2070.jpg", [0,20]);
+        svgImage('ball', 'gold', 10, "/img/rip2.jpg", [0,20]);
         //svgImage('tui', 'magenta', 10, url, [0,14]);
         
         //svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);
