@@ -41,7 +41,7 @@
               const diameter = brightnessScale(brightness); // Map brightness to circle diameter
               const x = i % canvas.width; // Calculate x position of circle
               const y = Math.floor(i / canvas.width); // Calculate y position of circle
-              const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i], fill: 'rgb(250,250,0,120)'};
+              const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
               circles.push(circle);
           }
 
@@ -81,12 +81,12 @@
         const url = "/img/" + filename;
 
         //img.src = url;
-        svgImage('darth', '#FFD700', 10, "/img/2070.jpg", [0,14]);
-        svgImage('darth', '#ff00ff', 10, url, [0,14]);
-        //svgImage('tui', '#00ff0066', 10, "/img/rip2.jpg");
+        svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
+        svgImage('base', 'red', 10, url, [0,20]);
+        svgImage('tui', 'gold', 10, "/img/rip2.jpg", [0,20]);
         //svgImage('tui', 'magenta', 10, url, [0,14]);
         
-        svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);
+        //svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);
         
         
         
