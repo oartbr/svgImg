@@ -41,6 +41,39 @@ window.svimg = (function (){
       }
 
     }
+
+    class shape{
+      constructor(sID, oOwner){
+        this.sID = sID;
+        this.oOwner = oOwner;
+        this.el = $(`<svg id="${this.sID}"></svg>`);
+        return this;
+      }
+
+    }
+
+    class hexagon extends shape{
+      constructor(x, y, r, sID, oOwner){
+        super(sID, oOwner);
+        this.shape = this.create(x, y, r, this.oOwner);
+      }
+
+      // Create a Hexagon, it needs Center coordinates and a radius
+      create (cx, cy, r, oOwner){
+        // Calculate the vertices for the hexagon
+        const hexagonVertices = Array.from({length: 6}).map((_, i) => {
+            const angle = 2 * Math.PI / 6 * i;
+            return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+        });
+
+        // Draw the hexagon using a path
+        const hexagonPath = `M${hexagonVertices[0][0]},${hexagonVertices[0][1]}` + 
+                            hexagonVertices.slice(1).map(p => `L${p[0]},${p[1]}`).join(" ") + 
+                            "Z";
+
+        return hexagonPath;
+      }
+    }
   
     if(window.top == window.self){
      return new Svimg();

@@ -11,12 +11,15 @@
   <body style="">
     <svg id="my-svg" width="2500" height="2500" style=" background: white">
     </svg>
+    
+
     <script>
         // Load the image
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         let images = [];
         let num = 1;
+        const matrix = [];
         /*
         const img = new Image();
         const img2 = new Image();
@@ -33,20 +36,34 @@
           const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
           const circles = [];
           const lines = [];
+          
           const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
           for (let i = 0; i < pixelCount; i++) {
               const R = pixelData[i * 4]; // Red value of pixel i
               const G = pixelData[i * 4 + 1]; // Green value of pixel i
               const B = pixelData[i * 4 + 2]; // Blue value of pixel i
               
+
+
               const brightness = 0.2126 * R + 0.7152 * G + 0.0722 * B; // Calculate brightness of pixel i
               const diameter = brightnessScale(brightness); // Map brightness to circle diameter
               const x = i % canvas.width; // Calculate x position of circle
+
+              if(typeof matrix[x] == 'undefined'){
+                matrix[x] = [];
+              }
+
               const y = Math.floor(i / canvas.width); // Calculate y position of circle
               const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
               circles.push(circle);
+
               const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
               lines.push(line);
+              
+              matrix[x][y] = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
+              
+
+
           }
 
 
@@ -88,8 +105,6 @@
 
         //img.onload = onload;
 
-
-
         //img.crossOrigin = "Anonymous";
         //const url = "https://chrome-cors-testing.s3.eu-central-1.amazonaws.com/hacksoft.svg";
         const link = window.location.pathname;
@@ -99,14 +114,12 @@
         //img.src = url;
         //svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
         svgImage('base', 'red', 10, url, [0,20]);
-        svgImage('tui', 'cyan', 10, "/img/2070.jpg", [0,20]);
-        svgImage('ball', 'gold', 10, "/img/rip2.jpg", [0,20]);
+        //svgImage('tui', 'cyan', 10, "/img/2070.jpg", [0,20]);
+        //svgImage('ball', 'gold', 10, "/img/rip2.jpg", [0,20]);
         //svgImage('tui', 'magenta', 10, url, [0,14]);
         
         //svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);
-        
-        
-        
+             
 
     </script>
   </body>
