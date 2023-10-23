@@ -8,8 +8,8 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="../js/svimg.js"></script>
   </head>
-  <body style="">
-    <svg id="my-svg" width="2500" height="2500" style=" background: white">
+  <body style="background:#000">
+    <svg id="my-svg" width="2500" height="2500" style=" background: #fff">
     </svg>
     
 
@@ -20,6 +20,7 @@
         let images = [];
         let num = 1;
         const matrix = [];
+        var json = [];
         /*
         const img = new Image();
         const img2 = new Image();
@@ -27,7 +28,6 @@
         img2.colorStroke = 'red';
 */
         const onload = function() {
-          console.log(this);
           canvas.width = this.width;
           canvas.height = this.height;
           ctx.drawImage(this, 0, 0);
@@ -54,24 +54,27 @@
               }
 
               const y = Math.floor(i / canvas.width); // Calculate y position of circle
-              const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
-              circles.push(circle);
 
-              const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
-              lines.push(line);
-              
+
+              if (diameter > 1) {
+                const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
+                circles.push(circle);
+
+                const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
+                lines.push(line);
+              }
+
               matrix[x][y] = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
               
-
-
           }
 
 
           // Create SVG container and add circles
 
           const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
-/*
-          svg.selectAll('circle').data(circles).enter().append('circle')
+          console.log(this.type);
+          if(this.type == 'balls'){
+            svg.selectAll('circle').data(circles).enter().append('circle')
               .attr('cx', d => d.x)
               .attr('cy', d => d.y)
               .attr('r', d => d.diameter / 4)
@@ -79,8 +82,8 @@
               .style('fill', '#ff000000')
               .attr("stroke-width", 1);
               //.attr('fill', d => `rgb(${pixelData[d.y * canvas.width * 4 + d.x * 4]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 1]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 2]})`);
-          */
-          svg.selectAll('line').data(lines).enter().append('line')
+          } else if(this.type == 'lines'){
+            svg.selectAll('line').data(lines).enter().append('line')
               .attr('x1', d => d.x + d.bid)
               .attr('y1', d => d.y)
               .attr('x2', d => d.x + d.diameter - d.bid)
@@ -88,18 +91,21 @@
               .style('stroke', this.colorStroke)
               .style('fill', '#ff000000')
               .attr("stroke-width", 1);
+          }
           
           d3.select('body').append('img');
         };
 
-        function svgImage(sName, sColor, sScale, sFile, aRange){
+        function svgImage(sName, sColor, sScale, sFile, aRange, sType){
           images[sName] = new Image();
           images[sName].colorStroke = sColor;
           images[sName].svgScale = sScale;
           images[sName].onload = onload;
-          images[sName].src = sFile;
+          images[sName].src = "../" + sFile;
           images[sName].range = aRange || [0,20];
           images[sName].bid = num++;
+          images[sName].type = sType;
+          json.push({layer: {sName, sColor, sScale, sFile, aRange, sType}});
           //console.log(images);
         }
 
@@ -113,9 +119,13 @@
 
         //img.src = url;
         //svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
-        svgImage('base', 'red', 10, url, [0,20]);
-        //svgImage('tui', 'cyan', 10, "/img/2070.jpg", [0,20]);
-        //svgImage('ball', 'gold', 10, "/img/rip2.jpg", [0,20]);
+        svgImage('mary', 'blue', 10, url, [5,20], 'balls');
+        svgImage('bg', 'cyan', 10, "/img/mary1.jpg", [0,20], 'balls');
+        svgImage('face', 'pink', 10, "/img/mary2.jpg", [0,12], 'balls');
+        svgImage('shirt', 'teal', 10, "/img/mary3.jpg", [0,20], 'balls');
+        svgImage('hair', 'gold', 10, "/img/mary4.jpg", [0,20], 'balls');
+        svgImage('eyes', 'turquoise', 10, "/img/mary5.jpg", [0,20], 'balls');
+        svgImage('lips', 'magenta', 10, "/img/mary6.jpg", [0,20], 'balls');
         //svgImage('tui', 'magenta', 10, url, [0,14]);
         
         //svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);

@@ -7,13 +7,13 @@ const path = require('path');
 // get an image file from the img folder
 router.get('/img/:fileName', (req, res) => {
     const fileName = req.params.fileName;
-    res.sendFile(path.join(__dirname, '../public', 'img/${fileName}'));
+    res.sendFile(path.join(__dirname, '../public', `img/${fileName}`));
 });
 
 // get a javascript file from the js folder
 router.get('/js/:fileName', (req, res) => {
     const fileName = req.params.fileName;
-    res.sendFile(path.join(__dirname, '../public', 'js/${fileName}'));
+    res.sendFile(path.join(__dirname, '../public', `js/${fileName}`));
 });
 
 // Show a picture with filter
