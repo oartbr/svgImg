@@ -51,7 +51,7 @@ const onload = function() {
 
   // Create SVG container and add circles
 
-  const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
+  const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale).attr("id",this.id );
   console.log(this.type);
   if(this.type == 'balls'){
     svg.selectAll('circle').data(circles).enter().append('circle')
@@ -85,6 +85,7 @@ function svgImage(sName, sColor, sScale, sFile, aRange, sType){
   images[sName].range = aRange || [0,20];
   images[sName].bid = num++;
   images[sName].type = sType;
+  images[sName].id = sName;
   json.push({layer: {sName, sColor, sScale, sFile, aRange, sType}});
   //console.log(images);
 }
