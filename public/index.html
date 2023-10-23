@@ -4,133 +4,41 @@
   <head>
     <meta charset="UTF-8">
     <title>Read img Example</title>
+
     <script src="https://releases.jquery.com/git/jquery-git.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="../js/svimg.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/views.css">
   </head>
   <body style="background:#000">
     <svg id="my-svg" width="2500" height="2500" style=" background: #fff">
     </svg>
-    
-
     <script>
-        // Load the image
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        let images = [];
-        let num = 1;
-        const matrix = [];
-        var json = [];
-        /*
-        const img = new Image();
-        const img2 = new Image();
-        img.colorStroke = 'blue';
-        img2.colorStroke = 'red';
-*/
-        const onload = function() {
-          canvas.width = this.width;
-          canvas.height = this.height;
-          ctx.drawImage(this, 0, 0);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const pixelData = imageData.data;
-          const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
-          const circles = [];
-          const lines = [];
-          
-          const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
-          for (let i = 0; i < pixelCount; i++) {
-              const R = pixelData[i * 4]; // Red value of pixel i
-              const G = pixelData[i * 4 + 1]; // Green value of pixel i
-              const B = pixelData[i * 4 + 2]; // Blue value of pixel i
+      $(function() { 
+        if(!svimg.getView()){
+          $.get("./show/dir", function(data) {
+              $("body").html(data);
+                $.getJSON('./show/list', function(data) {
+                    console.log(data); // This will print the parsed JSON data
+
+                    // You can now manipulate the data
+                    // For example, if your JSON contains an array of names:
+                    data.forEach(function(view) {
+                        $(".viewsList ul").append(`<li><a href="./show/${view}">${view}</a></li>`);
+                    });
+                });
               
+          })
+          .fail(function() {
+              console.error("Error loading content");
+          });
 
-
-              const brightness = 0.2126 * R + 0.7152 * G + 0.0722 * B; // Calculate brightness of pixel i
-              const diameter = brightnessScale(brightness); // Map brightness to circle diameter
-              const x = i % canvas.width; // Calculate x position of circle
-
-              if(typeof matrix[x] == 'undefined'){
-                matrix[x] = [];
-              }
-
-              const y = Math.floor(i / canvas.width); // Calculate y position of circle
-
-
-              if (diameter > 1) {
-                const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
-                circles.push(circle);
-
-                const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
-                lines.push(line);
-              }
-
-              matrix[x][y] = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
-              
-          }
-
-
-          // Create SVG container and add circles
-
-          const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
-          console.log(this.type);
-          if(this.type == 'balls'){
-            svg.selectAll('circle').data(circles).enter().append('circle')
-              .attr('cx', d => d.x)
-              .attr('cy', d => d.y)
-              .attr('r', d => d.diameter / 4)
-              .style('stroke', this.colorStroke)
-              .style('fill', '#ff000000')
-              .attr("stroke-width", 1);
-              //.attr('fill', d => `rgb(${pixelData[d.y * canvas.width * 4 + d.x * 4]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 1]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 2]})`);
-          } else if(this.type == 'lines'){
-            svg.selectAll('line').data(lines).enter().append('line')
-              .attr('x1', d => d.x + d.bid)
-              .attr('y1', d => d.y)
-              .attr('x2', d => d.x + d.diameter - d.bid)
-              .attr('y2', d => d.y + d.diameter)
-              .style('stroke', this.colorStroke)
-              .style('fill', '#ff000000')
-              .attr("stroke-width", 1);
-          }
-          
-          d3.select('body').append('img');
         };
-
-        function svgImage(sName, sColor, sScale, sFile, aRange, sType){
-          images[sName] = new Image();
-          images[sName].colorStroke = sColor;
-          images[sName].svgScale = sScale;
-          images[sName].onload = onload;
-          images[sName].src = "../" + sFile;
-          images[sName].range = aRange || [0,20];
-          images[sName].bid = num++;
-          images[sName].type = sType;
-          json.push({layer: {sName, sColor, sScale, sFile, aRange, sType}});
-          //console.log(images);
-        }
-
-        //img.onload = onload;
-
-        //img.crossOrigin = "Anonymous";
-        //const url = "https://chrome-cors-testing.s3.eu-central-1.amazonaws.com/hacksoft.svg";
-        const link = window.location.pathname;
-        const filename = link.substring(link.lastIndexOf('/')+1);
-        const url = "/img/" + filename;
-
-        //img.src = url;
-        //svgImage('ball', 'blue', 10, "/img/2070.jpg", [0,20]);
-        svgImage('mary', 'blue', 10, url, [5,20], 'balls');
-        svgImage('bg', 'cyan', 10, "/img/mary1.jpg", [0,20], 'balls');
-        svgImage('face', 'pink', 10, "/img/mary2.jpg", [0,12], 'balls');
-        svgImage('shirt', 'teal', 10, "/img/mary3.jpg", [0,20], 'balls');
-        svgImage('hair', 'gold', 10, "/img/mary4.jpg", [0,20], 'balls');
-        svgImage('eyes', 'turquoise', 10, "/img/mary5.jpg", [0,20], 'balls');
-        svgImage('lips', 'magenta', 10, "/img/mary6.jpg", [0,20], 'balls');
-        //svgImage('tui', 'magenta', 10, url, [0,14]);
-        
-        //svgImage('darth', '#00ffff', 10, "/img/brain.jpg", [0,14]);
-             
+      });
 
     </script>
+
+
+    
   </body>
 </html>
