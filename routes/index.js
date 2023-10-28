@@ -42,7 +42,7 @@ router.get('/view/:fileName', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', `/inks/${fileName}`), (err) => {
         if (err) {
             // Handle the error
-            res.status(404).redirect('/view/error.js');
+            res.status(404).redirect('./error.js');
         } 
     });
     

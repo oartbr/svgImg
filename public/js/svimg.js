@@ -81,7 +81,7 @@ function svgImage(sName, sColor, sScale, sFile, aRange, sType){
   images[sName].colorStroke = sColor;
   images[sName].svgScale = sScale;
   images[sName].onload = onload;
-  images[sName].src = "../" + sFile;
+  images[sName].src = "." + sFile;
   images[sName].range = aRange || [0,20];
   images[sName].bid = num++;
   images[sName].type = sType;
