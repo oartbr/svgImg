@@ -63,12 +63,11 @@ router.get('/show/:fileName', (req, res) => {
             files.forEach(file => {
                 aFiles.push(file.split(".")[0]);
             });
-            console.log({aFiles});
             res.json(aFiles);
         });
 
     } else if (fileName == ''){
-        res.redirect('/');
+        res.redirect(project.base);
     } else {
         project['show'] = fileName;
         res.render('index', project);
