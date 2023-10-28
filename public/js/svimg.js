@@ -50,7 +50,7 @@ const onload = function() {
 
 
   // Create SVG container and add circles
-
+  d3.select('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
   const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale).attr("id",this.id );
   console.log(this.type);
   if(this.type == 'balls'){

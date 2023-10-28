@@ -1,0 +1,15 @@
+<!-- Include Header -->
+<%- include('./partials/header') %>
+<script>
+    $(function() { 
+        if(!svimg.getView()){
+          window.location = "/";
+        };
+      });
+</script>
+<div class="main">
+    <%- include('./partials/inks') %>
+    <svg id="my-svg" style=" background: #fff"></svg>
+</div>
+<!-- Include Footer -->
+<%- include('./partials/footer') %>

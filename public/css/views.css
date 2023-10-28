@@ -1,6 +1,54 @@
-.views{
+body{
+    background: #000;
+}
+.main{
     background: #fff;
-    height: 20em;
+    min-height: 20em;
     margin: 1em;
     padding: 1em;
+}
+header{
+    display: flex;
+    justify-content:space-evenly;
+}
+.column {
+    flex: 1;  /* This makes both columns take up equal width */
+    padding: 0px;  /* Optional: Adds some space inside each column */
+}
+.views{
+    background: #fff;
+    margin: 1em;
+    padding: 1em;
+}
+.TopTitle{
+    color: #fff;
+}
+.inkName{
+    font-size: 6em;
+    color: #666;
+    vertical-align: bottom;
+    height: 100%;
+}
+.inks{
+    min-width: 10em;
+    max-width: 80%;
+    min-height: 6.5em;
+    float: right;
+    position: absolute;
+    top: 10px;
+    right: 1.5em;
+    background-color: #eee;
+}
+.inks ul{
+    display: flex;
+    justify-content: space-between;
+
+}
+.inks li{
+    margin-right: 10px;
+    display: inline-block;
+}
+footer{
+    text-align: center;
+    color: #999;
 }
