@@ -18,28 +18,28 @@ const project = {
 router.get('/img/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     project['action'] = '/img'; 
-    res.sendFile(path.join(__dirname, '../public', `img/${fileName}`));
+    res.sendFile(path.join(__dirname, '../public', `/img/${fileName}`));
 });
 
 // get a javascript file from the js folder
 router.get('/js/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     project['action'] = '/js';
-    res.sendFile(path.join(__dirname, '../public', `js/${fileName}`));
+    res.sendFile(path.join(__dirname, '../public', `/js/${fileName}`));
 });
 
 // get a css file from the css folder
 router.get('/css/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     project['action'] = '/css';
-    res.sendFile(path.join(__dirname, '../public', `css/${fileName}`));
+    res.sendFile(path.join(__dirname, '../public', `/css/${fileName}`));
 });
 
 // Show a picture with filter
 router.get('/view/:fileName', (req, res) => {
     const fileName = (req.params.fileName != ".js") ? req.params.fileName : "error.js";
     project['action'] = '/view';
-    res.sendFile(path.join(__dirname, '../public', `inks/${fileName}`), (err) => {
+    res.sendFile(path.join(__dirname, '../public', `/inks/${fileName}`), (err) => {
         if (err) {
             // Handle the error
             res.status(404).redirect('/view/error.js');
@@ -51,7 +51,7 @@ router.get('/view/:fileName', (req, res) => {
 // Show a picture with filter
 router.get('/show/:fileName', (req, res) => {
     const fileName = req.params.fileName;
-    project['action'] = path.join(__dirname, '../public', `inks/${fileName}`);
+    project['action'] = path.join(__dirname, '../public', `/inks/${fileName}`);
     if(fileName == 'list'){
         const directoryPath = project['base'] + 'public/inks';  // Replace with your directory path
         const aFiles = [];
