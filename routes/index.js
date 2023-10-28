@@ -6,8 +6,8 @@ const path = require('path');
 const fs = require('fs');
 const __baseDir = process.env.BASE_DIR;
 const project = {
-    title: "The Drawing Machine",
-    subtitle: "This is under development. The idea is to create some good stuff.",
+    title: "For the Drawing Machine ",
+    subtitle: "This is under development. Nothing to see here.",
     fileBase: process.cwd(),
     base: __baseDir,
     action: '',
