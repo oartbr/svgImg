@@ -120,7 +120,7 @@ window.svimg = (function (){
         
         const link = window.location.pathname;
         const fileName = link.substring(link.lastIndexOf('/')+1);
-        const url = "/view/" + fileName + ".js";
+        const url = svimg.base + "view/" + fileName + ".js";
 
         console.log(fileName);
         if(typeof fileName == 'string' && fileName != 'show'){
