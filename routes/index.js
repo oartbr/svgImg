@@ -17,7 +17,7 @@ const project = {
 // get an image file from the img folder
 router.get('/img/:fileName', (req, res) => {
     const fileName = req.params.fileName;
-    project['action'] = '/img';
+    project['action'] = '/img'; 
     res.sendFile(path.join(__dirname, '../public', `img/${fileName}`));
 });
 
