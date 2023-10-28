@@ -8,6 +8,7 @@ const __baseDir = process.env.BASE_DIR;
 const project = {
     title: "The Drawing Machine",
     subtitle: "This is under development. The idea is to create some good stuff.",
+    fileBase: process.cwd(),
     base: __baseDir,
     action: '',
     files: [],
@@ -53,7 +54,7 @@ router.get('/show/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     project['action'] = path.join(__dirname, '../public', `/inks/${fileName}`);
     if(fileName == 'list'){
-        const directoryPath = '.' + project.base + 'public/inks';  // Replace with your directory path
+        const directoryPath = project.fileBase + '/public/inks';  // Replace with your directory path
         const aFiles = [];
 
         fs.readdir(directoryPath, (err, files) => {
@@ -94,7 +95,7 @@ router.get('/user/:username', (req, res) => {
 
 // Home route
 router.get('/', (req, res) => {
-    const directoryPath = '.' + project.base + 'public/inks';  // Replace with your directory path
+    const directoryPath = project.fileBase + '/public/inks';  // Replace with your directory path
     project['action'] = '/';
     fs.readdir(directoryPath, (err, files) => {
         const aFiles = [];
