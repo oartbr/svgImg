@@ -94,8 +94,9 @@ router.get('/user/:username', (req, res) => {
 
 // Home route
 router.get('/', (req, res) => {
-    const directoryPath = project['base'] + 'public/inks';  // Replace with your directory path
+    const directoryPath = './public/inks';  // Replace with your directory path
     project['action'] = '/';
+    console.log({link:directoryPath});
     fs.readdir(directoryPath, (err, files) => {
         const aFiles = [];
         if (err) {
