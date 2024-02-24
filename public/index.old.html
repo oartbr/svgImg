@@ -9,10 +9,55 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="../js/svimg.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/views.css">
+    <style>
+      .bar{
+        width: 160px;
+        display: flex;
+        flex-wrap: wrap;
+        transform: rotate(180deg);
+      }
+      .A, .B, .C{
+        flex: 0 0 calc(33.333% - 1px); /* Let's assume we want 3 boxes per row, with a gap of 10px */
+        margin-right: 1px;
+        margin-bottom: 1px;
+      }
+
+      .A{
+        width: 32px;
+        height: 32px;
+        background-color: blue;
+      }
+      .B{
+        width: 16px;
+        height: 16px;
+        background-color: pink;
+      }
+      .C{
+        width: 8px;
+        height: 8px;
+        background-color: gold;
+      }
+      /* Clear right margin for every 3rd box */
+      .box:nth-child(3n) {
+          margin-right: 0;
+      }
+    </style>
   </head>
   <body style="background:#000">
-    <div class="404">
-      You lost? 
+    <div class="bar">
+      <div class="A box"> </div>
+      <div class="A box"> </div>
+      <div class="A box"> </div>
+      <div class="B box"> </div>
+      <div class="B box"> </div>
+      <div class="B box"> </div>
+      <div class="B box"> </div>
+      <div class="B box"> </div>
+      <div class="C box"> </div>
+      <div class="C box"> </div>
+      <div class="C box"> </div>
+      <div class="C box"> </div>
+      <div class="C box"> </div>
     </div>
   </body>
 </html>

@@ -1,8 +1,6 @@
 /* 
-   Brain V0.1 
-   Oct 22nd 2023
+   Brain V0.2
+   Feb 18th 2024
+   svimg.insertLayer(sName, sColor, sScale, sFile, aRange, sType, iThickness)
 */
-svgImage('brain', 'blue', 10, "/img/brain.jpg", [0,20], 'balls');
-svgImage('brain', 'green', 10, "/img/drew.jpg", [0,20], 'balls');
-
-//svgImage('waves', 'blue', 10, "/img/waves2.jpg", [0,20], 'balls');
+svimg.insertLayer('brain', 'blue', 1, "/img/brain.jpg", [0,20], 'lines');

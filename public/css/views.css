@@ -29,6 +29,11 @@ header{
     vertical-align: bottom;
     height: 100%;
 }
+.downloadLink{
+    padding: 0 1em ;
+    color: orange;
+
+}
 .inks{
     min-width: 10em;
     max-width: 80%;
