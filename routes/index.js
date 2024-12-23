@@ -16,6 +16,7 @@ router.use(bodyParser.urlencoded({
     limit: process.env.APP_UPLOAD_LIMIT  || '10mb' // Set limit to 10MB, adjust as needed
   }));
 
+const link = window.location.pathname;
 const project = {
     title: "For the Drawing Machine ",
     subtitle: "This is under development. Nothing to see here.",
@@ -24,7 +25,8 @@ const project = {
     action: '',
     files: [],
     show:'',
-    upload_dir: process.env.APP_UPLOAD_DIR 
+    upload_dir: process.env.APP_UPLOAD_DIR ,
+    currentFile: link.substring(link.lastIndexOf('/')+1)
 };
 
 // get an image file from the img folder
@@ -72,6 +74,7 @@ router.get('/view/:fileName', (req, res) => {
 router.get('/show/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     project['action'] = path.join(__dirname, '../public', `/inks/${fileName}`);
+
     if(fileName == 'list'){
         const directoryPath = project.fileBase + '/public/inks';  // Replace with your directory path
         const aFiles = [];
@@ -90,6 +93,7 @@ router.get('/show/:fileName', (req, res) => {
         res.redirect(project.base);
     } else {
         project['show'] = fileName;
+        
         res.render('index', project);
     }
 });

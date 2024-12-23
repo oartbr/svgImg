@@ -53,6 +53,14 @@ header{
     margin-right: 10px;
     display: inline-block;
 }
+.inks select{
+    font-size: 20px;
+}
+.inkSelect{
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #000;
+}
 footer{
     text-align: center;
     color: #999;

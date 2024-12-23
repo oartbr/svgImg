@@ -83,5 +83,5 @@ function makePath(hStroke, iRadius, iJump, iStroke_width){
     iStroke-width = stroke with in pixels. It can be a decimal!
 */
 
-//makePath('AAFF0099', 480, Math.random() * 100, 4);
+makePath('AAFF0099', 480, Math.random() * 100, 4);
 makePath('0047AB99', 480, Math.random() * 20, 1);

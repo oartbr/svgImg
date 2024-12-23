@@ -20,9 +20,13 @@
         <div class="column">
             <h1><%= title %></h1>
             <p><%= subtitle %></p>
-            <script>svimg.button();</script>
+            <script>
+                svimg.insertButton('Download', ()=>svimg.generateFiles('Download'));
+                svimg.insertButton('Refresh', ()=>svimg.refresh());
+                svimg.insertButton('Reset', ()=>svimg.reset());
+            </script>
         </div>
         <div class="column">
-            <div class="inkName"><%= show %></div>
+            <div class="inkName"><%- include('./inks') %></div>
         </div>
     </header>

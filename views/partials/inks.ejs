@@ -1,11 +1,16 @@
+<script>
+    function gotoInk(url) {
+        window.location.href = url; 
+    }
+</script>
 <% if(files.length > 0){ %>
-    <div class="inks">
-        <ul>
+
+        <select onchange="gotoInk(this.value)" class="inkSelect">
             <% files.forEach(function(file) { %>
-                <li><a href="./show/<%= file %>"><%= file %></a></li>
+                <option value="./show/<%= file %>" <%= show == file ? 'selected="selected"' : '' %>><%= file %></option>
             <% }); %>
-        </ul>
-    </div>
+        </select>
+
 <%} else {%>
     <div class="inks">
         <div class="alert">No inks to display</div>
