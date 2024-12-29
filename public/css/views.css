@@ -61,6 +61,31 @@ header{
     color: #ffffff;
     background-color: #000;
 }
+.layerButtons{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    top: 8.7rem;
+    left: 1.5rem;
+}
+.layerButton {
+    color: #666;
+    background: white;
+    border-radius: 5px;
+    margin-right: 0.2rem;
+    padding: 0.2rem 0.5rem;
+}
+.layerButton:hover{
+    color: #f00;
+    cursor: pointer;
+}
+.layerButton.inactive{
+    color: #ccc;
+    border-top: 2px solid red;
+}
+svg.inactive{
+    display: none;
+}
 footer{
     text-align: center;
     color: #999;

@@ -1,5 +1,4 @@
 /* General functions / initial version  */
-// Load image
 
 d3.polygon = function(sides, centerX, centerY, size) {
   var points = [];
@@ -123,13 +122,15 @@ window.svimg = (function (){
         console.log("Svimg is on babe!");
         $("body").append("<top></top>");
         $(document).ready(function() {
-          this.addTransformer(new MapIm('mapIm'));
-          this.addTransformer(new Orbiter('orbiter'));
+          this.addTransformer('mapIm', MapIm);
+          this.addTransformer('mapper', Mapper);
+          this.addTransformer('orbiter', Orbiter);
           this.util = new Util();
         }.bind(this));
       },
-      addTransformer(oTob){
-        this.transformers[oTob.sId] = oTob;
+      addTransformer(sId, oTob){
+        //this.transformers[oTob.sId] = oTob;
+        this.transformers[sId] = oTob;
       },
       addGenerator(oGob){
         this.generators[oGob.sId] = oGob;
@@ -156,6 +157,15 @@ window.svimg = (function (){
         let oSvg = new SVG(sID, oOwner);
         this.svg.push(oSvg);
         return oSvg;
+      },
+      addLayerButton(sID, oOwner){
+        const oButton = $("<div class='layerButton' id='" + sID + "_control'>" + sID + "</div>");
+        $(".layerButtons").append(oButton);
+
+        $(oButton).on("click", function(){
+          $("svg#" + oOwner.id).toggleClass("inactive");
+          $(this).toggleClass("inactive");
+        });
       },
       getView(){
         //img.crossOrigin = "Anonymous";
@@ -188,10 +198,35 @@ window.svimg = (function (){
       },
       insertLayer(sName, sColor, sScale, sFile, aRange, sType, iThickness, sTransformer = 'mapIm'){
         sName = this.fileName + '_' + this.makeUnik();
+        const transformer = this.transformers[sTransformer];
+        
         this.svg[sName] = new Image();
+        this.svg[sName].transformer = new transformer(sName);
         this.svg[sName].colorStroke = sColor;
         this.svg[sName].svgScale = sScale;
-        this.svg[sName].onload = this.transformers[sTransformer].onload;
+        this.svg[sName].onload = this.svg[sName].transformer.onload;
+        this.svg[sName].src = "." + sFile;
+        this.svg[sName].range = aRange || [0,20];
+        this.svg[sName].bid = num++;
+        this.svg[sName].type = sType;
+        this.svg[sName].id = sName;
+        this.svg[sName].thickness = iThickness || 1;
+        this.svg[sName].density = this.density || 1;
+        this.svg[sName].center = this.center || {x:0, y:0};
+        this.layer.push({sName, sColor, sScale, sFile, aRange, sType, iThickness});
+        this.density = 1;// this resets density for each layer
+        this.addLayerButton(sName, this.svg[sName]);
+        return this.svg[sName].transformer;
+      },
+      createLayer(sTransformer, sFile, sColor, sScale, aRange, iThickness, sType){
+        sName = this.fileName + '_' + this.makeUnik();
+        const transformer = this.transformers[sTransformer];
+
+        this.svg[sName] = new Image();
+        this.svg[sName].transformer = new transformer(sName);
+        this.svg[sName].colorStroke = sColor;
+        this.svg[sName].svgScale = sScale;
+        this.svg[sName].onload = this.svg[sName].transformer.onload;
         this.svg[sName].src = "." + sFile;
         this.svg[sName].range = aRange || [0,20];
         this.svg[sName].bid = num++;
@@ -201,9 +236,15 @@ window.svimg = (function (){
         this.svg[sName].density = this.density || 1;
         this.layer.push({sName, sColor, sScale, sFile, aRange, sType, iThickness});
         this.density = 1;// this resets density for each layer
+        this.addLayerButton(sName, this.svg[sName]);
+        return this.svg[sName].transformer;
       },
       setDensity(iDens){
         this.density = iDens;
+        return this;
+      },
+      setCenter(x,y){
+        this.center = {x,y};
         return this;
       },
       addLayer(oLayer, sName){
@@ -250,29 +291,32 @@ window.svimg = (function (){
 
       /*  this gets the layers on the design, includes it on a text and calls the back-end to generate the files to download */
       generateDownloads(sButtonName){
-        
-        const sUnik = this.makeUnik();// this will be a unik code for the file
-        
-        const oLayer = {}; //  creates the layer that will append all the layers
-        oLayer.fileName = this.fileName + ".svg";
-        oLayer.id = sUnik;
-        
+        const sFileName = this.fileName;
+
         this.layer.forEach(layer => {
+          
+          const oLayer = {}; //  creates the layer that will append all the layers
+          oLayer.fileName = layer.sName + ".svg";
+          oLayer.id = sFileName;
           const element = $("svg#" + layer.sName);
           const sStroke = $("path", element).css('stroke');
           const sStrokeNoAlpha = this.rgbaToHexA(sStroke).slice(0, -2);
-          $("path", element).css('stroke', sStrokeNoAlpha); // this removes the transparency from the color of the path because the files can't have any transparency to work on inkscape
           
+          $("path", element).css('stroke', sStrokeNoAlpha); // this removes the transparency from the color of the path because the files can't have any transparency to work on inkscape
           $("path", element).css('stroke', sStroke); // this returns the original color to the path
+
           //$(element).prop('width', '100%').prop('height', '100%');
           oLayer.svg += element.prop('outerHTML'); // this includes the svg and the path on a text to be sent to the server
           //console.log(this.makeUnik(), element.prop('outerHTML'));
+          if(!element.hasClass("inactive")){ 
+            $.post("../file/download/" + oLayer.fileName, oLayer, function(data){
+              const downloadLink = $(data).addClass("downloadLink");
+              $(`button.${sButtonName}`).after(downloadLink);//this gets the return from the server and creates a link for download.
+            });
+          }
         });
 
-        $.post("../file/download/" + oLayer.fileName, oLayer, function(data){
-          const downloadLink = $(data).addClass("downloadLink");
-          $(`button.${sButtonName}`).after(downloadLink);//this gets the return from the server and creates a link for download.
-        });
+
 
       },
 
@@ -398,14 +442,34 @@ class Transformer {
   constructor(sId){
     this.sId = sId;
   }
+
+  attr(sAttribute, sValue){
+    if(sValue){
+      this[sAttribute] = sValue;
+    } else {
+      return this[sAttribute];
+    }
+    return this;
+  }
+
 }
 
 class MapIm extends Transformer{
   constructor(sId){
     super(sId);
+    this.type = 'mapIm';
   }
 
   onload() {
+    function findDirection(x1, y1, x2, y2){
+      return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI; // returns the angle in degrees
+    }
+  
+    function traceSwivel(x,y,angle, length){
+      const x2 = x + length * Math.cos(angle * Math.PI / 180);
+      const y2 = y + length * Math.sin(angle * Math.PI / 180);
+      return {x1: x, y1: y, x2: x2, y2: y2};
+    }
     canvas.width = this.width;
     canvas.height = this.height;
     ctx.drawImage(this, 0, 0);
@@ -414,13 +478,18 @@ class MapIm extends Transformer{
     const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
     const circles = [];
     const lines = [];
+    const swivels = [];
     const polygons = [];
     const density = this.density;
     let countDensity = 0;
     let prevDot = {x:0,y:0};
     let currentDot = {x:0,y:0};
+    let direction = 0;
+    let swivel = 0;
+    const center = this.center;
     
     const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
+
     for (let i = 0; i < pixelCount; i++) {
         const R = pixelData[i * 4]; // Red value of pixel i
         const G = pixelData[i * 4 + 1]; // Green value of pixel i
@@ -437,14 +506,18 @@ class MapIm extends Transformer{
         }
 
         const y = Math.floor(i / canvas.width); // Calculate y position of circle
-
+        
+        direction = findDirection(x*this.svgScale, y*this.svgScale, this.center.x, this.center.y);
+        swivel = traceSwivel(x*this.svgScale + 3 - Math.floor(Math.random() * 6), y*this.svgScale + 3 - Math.floor(Math.random() * 6), direction, diameter);
 
         if (diameter > 1 && countDensity % density == 0) {
           const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
           circles.push(circle);
-
+          
           const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
           lines.push(line);
+
+          swivels.push(swivel);
         }
 
         matrix[x][y] = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
@@ -452,7 +525,7 @@ class MapIm extends Transformer{
         
     }
 
-      // Create SVG container and add circles
+      // Create SVG container and add elements
     d3.select('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
     const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale).attr("id",this.id );
     
@@ -494,45 +567,214 @@ class MapIm extends Transformer{
         .style('stroke', this.colorStroke)
         .style('fill', '#ff000000')
         .attr("stroke-width", this.thickness);
-    } else if (this.type == 'wavels'){
-      function wavel(oD, bEnd){
-        if(prevDot.x == 0 && prevDot.y == 0){ // se for zero, seta o valor de partida. Isto só pode acontecer uma vez, logo no inicio.
-          prevDot.x = oD.x + oD.bid + 10 - Math.floor(Math.random() * 20);
-          prevDot.y = oD.y + 3 - Math.floor(Math.random() * 6);
-        }         
-        if (bEnd){ // se for o fim da linha, calcula onde deveria ser e muda o valor de prevDot.
-          prevDot.x = oD.x + oD.diameter + 10 - Math.floor(Math.random() * 20);
-          prevDot.y = oD.y + oD.diameter + 3 - Math.floor(Math.random() * 6);
-        }
-        oD.x = prevDot.x; // muda o valor de oD para o valor de prevDot
-        oD.y = prevDot.y; // se não é o final da linha, prevDot estaria no valor anterior e não mudamos eles. Isto é, o início da linha é igual ao final da anterior.
-        
-        return oD; // retorna o valor de oD
-      }
-
-      svg.selectAll('line').data(lines).enter().append('line')
-      .attr('x1', d => {
-        const start = wavel(d, false);
-        return start.x;
-      })
-      .attr('y1', d => {
-          const start = wavel(d, false);
-          return start.y;
-      })
-      .attr('x2', d => {
-          const end = wavel(d, true);
-          return end.x;
-      })
-      .attr('y2', d => {
-          const end = wavel(d, true);
-          return end.y;
-      })
+    }   else if (this.type == 'swivels'){
+      svg.selectAll('swivel').data(swivels).enter().append('line')
+        .attr('x1', d => d.x1)
+        .attr('y1', d => d.y1)
+        .attr('x2', d => d.x2)
+        .attr('y2', d => d.y2)
         .style('stroke', this.colorStroke)
         .style('fill', '#ff000000')
         .attr("stroke-width", this.thickness);
-      
+    } else if (this.type == 'overlapper'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + d.bid + 10 - Math.floor(Math.random() * 20))
+        .attr('y1', d => d.y + 3 - Math.floor(Math.random() * 6))
+        .attr('x2', d => d.x + d.diameter + 10 - Math.floor(Math.random() * 20))
+        .attr('y2', d => d.y + d.diameter + 3 - Math.floor(Math.random() * 6))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    } else if (this.type == 'poly'){
+      svg.selectAll('polygon').data(polygon).enter().append('polygon')
+        .attr("d", d3.polygon(6, d.x, d.x, d.diameter))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff0000ff')
+        .attr("stroke-width", this.thickness);
+    }
 
+        // square for alignment
+        svg.append('rect')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('width', 5) // Set the width of the square
+          .attr('height', 5) // Set the height of the square
+          .style('stroke', '#ff0000')
+          .style('fill', 'none')
+          .attr("stroke-width", 0.1);
+        svg.append('circle')
+          .attr('cx', 0)
+          .attr('cy', 0)
+          .attr('r', 5) // Set the width of the square
+          .style('stroke', '#ff0000')
+          .style('fill', 'none')
+          .attr("stroke-width", 0.1);
+    
+    d3.select('body').append('img');
+
+    return matrix
+  }
+}
+
+class Mapper extends Transformer{
+  constructor(sId){
+    super(sId);
+    this.type = 'mapper';
+    this.limit = 0;
+  }
+
+  setCenter(iX, iY){
+    this.center = {x:iX || 0, y:iY || 0};
+    return this;
+  }
+
+  findDirection(x1, y1, x2, y2){
+    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI; // returns the angle in degrees
+  }
+
+  traceSwivel(x,y,angle, length){
+    const x2 = x + length * Math.cos(angle * Math.PI / 180);
+    const y2 = y + length * Math.sin(angle * Math.PI / 180);
+    return {x1: x, y1: y, x2: x2, y2: y2};
+  }
+
+  onload() {
+    canvas.width = this.width;
+    canvas.height = this.height;
+    ctx.drawImage(this, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixelData = imageData.data;
+    const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
+    const circles = [];
+    const lines = [];
+    const swivels = [];
+    const polygons = [];
+    const density = this.density;
+    let countDensity = 0;
+    let prevDot = {x:0,y:0};
+    let currentDot = {x:0,y:0};
+    let direction = 0;
+    let swivel = 0;
+    this.center = this.transformer.center;
+    
+    const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
+    console.log(this.transformer.sId, this.transformer.limit);
+    for (let i = 0; i < pixelCount; i++) {
+        const R = pixelData[i * 4]; // Red value of pixel i
+        const G = pixelData[i * 4 + 1]; // Green value of pixel i
+        const B = pixelData[i * 4 + 2]; // Blue value of pixel i
+        countDensity++;
+
+
+        const brightness = 0.2126 * R + 0.7152 * G + 0.0722 * B; // Calculate brightness of pixel i
+        const diameter = brightnessScale(brightness); // Map brightness to circle diameter
+        const x = i % canvas.width; // Calculate x position of circle
+
+        if(typeof matrix[x] == 'undefined'){
+          matrix[x] = [];
+        }
+
+        const y = Math.floor(i / canvas.width); // Calculate y position of circle
+        
+        direction = this.transformer.findDirection(x*this.svgScale, y*this.svgScale, this.center.x, this.center.y);
+        swivel = this.transformer.traceSwivel(x*this.svgScale + 3 - Math.floor(Math.random() * 6), y*this.svgScale + 3 - Math.floor(Math.random() * 6), direction, diameter);
+
+        
+        const hasLimit = (this.transformer.limit) ? diameter > (this.range[1] - this.transformer.limit) : true;
+
+        if (diameter > 1 && countDensity % density == 0 && hasLimit) {
+          const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
+          circles.push(circle);
+          
+          const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
+          lines.push(line);
+
+          swivels.push(swivel);
+        }
+
+        matrix[x][y] = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
       
+        
+    }
+
+      // Create SVG container and add elements
+    d3.select('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
+    const svg = d3.select('svg').append('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale).attr("id",this.id );
+    
+    if (this.type == 'balls'){
+     
+      svg.selectAll('circle').data(circles).enter().append('circle')
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .attr('r', d => (d.diameter / 4))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+        //.attr('fill', d => `rgb(${pixelData[d.y * canvas.width * 4 + d.x * 4]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 1]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 2]})`);
+    } else if (this.type == 'doodles'){
+     
+      svg.selectAll('circle').data(circles).enter().append('circle')
+        .attr('cx', d => d.x + 3 - Math.floor(Math.random() * 6))
+        .attr('cy', d => d.y + 3 - Math.floor(Math.random() * 6))
+        .attr('r', d => (d.diameter / 4))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+        //.attr('fill', d => `rgb(${pixelData[d.y * canvas.width * 4 + d.x * 4]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 1]}, ${pixelData[d.y * canvas.width * 4 + d.x * 4 + 2]})`);
+    } else if (this.type == 'hLines'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x )
+        .attr('y1', d => d.y)
+        .attr('x2', d => d.x + (d.diameter/3))
+        .attr('y2', d => d.y + (d.diameter/7))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    }  else if (this.type == 'vLines'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + d.bid)
+        .attr('y1', d => d.y)
+        .attr('x2', d => d.x + d.diameter - d.bid)
+        .attr('y2', d => d.y + (d.diameter/2))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    } else if (this.type == 'dLines'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x)
+        .attr('y1', d => d.y)
+        .attr('x2', d => d.x + d.diameter + 10 - Math.floor(Math.random() * 20))
+        .attr('y2', d => d.y)
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    } else if (this.type == 'lines'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + d.bid)
+        .attr('y1', d => d.y)
+        .attr('x2', d => d.x + d.diameter - d.bid)
+        .attr('y2', d => d.y + d.diameter)
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    }  else if (this.type == 'scribbles'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + d.bid + 10 - Math.floor(Math.random() * 20))
+        .attr('y1', d => d.y + 3 - Math.floor(Math.random() * 6))
+        .attr('x2', d => d.x + d.diameter + 10 - Math.floor(Math.random() * 20))
+        .attr('y2', d => d.y + d.diameter + 3 - Math.floor(Math.random() * 6))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
+    }   else if (this.type == 'swivels'){
+      svg.selectAll('swivel').data(swivels).enter().append('line')
+        .attr('x1', d => d.x1)
+        .attr('y1', d => d.y1)
+        .attr('x2', d => d.x2)
+        .attr('y2', d => d.y2)
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
     } else if (this.type == 'overlapper'){
       svg.selectAll('line').data(lines).enter().append('line')
         .attr('x1', d => d.x + d.bid + 10 - Math.floor(Math.random() * 20))
@@ -577,6 +819,17 @@ class Orbiter extends Transformer{
   constructor(sId){
     super(sId);
     this.element = svimg.getTop("my-svg", 2500, 2500);
+    this.type = 'orbiter';
+  }
+
+  direction(x1, y2, x2, y1){
+    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI; // returns the angle in degrees
+  }
+
+  line(x,y,angle, length){
+    const x2 = x + length * Math.cos(angle * Math.PI / 180);
+    const y2 = y + length * Math.sin(angle * Math.PI / 180);
+    return {x1: x, y1: y, x2: x2, y2: y2};
   }
 
   onload() {
@@ -624,7 +877,7 @@ class Orbiter extends Transformer{
     
       // Create SVG container and add circles
     d3.select('svg').attr('width', canvas.width*this.svgScale).attr('height', canvas.height*this.svgScale);
-    svimg.transformers['orbiter'].makePath('0047AB66', 1250, 1, 0.5, matrix, this.svgScale, canvas.width, canvas.height);
+    svimg.transformers['orbiter'].makePath('0047AB66', canvas.width, 1, 0.5, matrix, this.svgScale, canvas.width, canvas.height);
 
     
     d3.select('body').append('img');
@@ -639,7 +892,7 @@ class Orbiter extends Transformer{
                 .attr('class', 'downloadable')
                 .attr('height', '100%')
                 .attr('width', '100%');
-    console.log({iJump, iScale, canvas_width, canvas_height});
+    //console.log({iJump, iScale, canvas_width, canvas_height});
     svimg.addLayer(oLayer, sUnik);
 
     let oLine = svimg.d3.line()
@@ -650,16 +903,16 @@ class Orbiter extends Transformer{
     let pathArray = [];
     let iX = 0;
     let iY = 0;
-    let circX = 500;
-    let circY = 600;
-    let cX = 1250;
-    let cY = 1250;
-    let nPoints = 360;//10 + Math.random() * 30;
-    let radius = 1;
-    let iDirection = -1;
+    let circX = 0; // this will be the location of the calculated point
+    let circY = 0; // this will be the location of the calculated point
+    let cX = 125; //this is the center of the spiral
+    let cY = 125; //this is the center of the spiral
+    let nPoints = 360;//10 + Math.random() * 30; // this is the number of points on the spiral
+    let radius = 1; // this is the radius of the spiral
+    let iDirection = -1; // this is the direction of the spiral
 
-    let prevX = 0;
-    let prevY = 0;
+    let prevX = 0; // this is the previous x point
+    let prevY = 0; // this is the previous y point
 
     for(let i = 0; i < nPoints * 80; i++ ){
       setTimeout(() => {
@@ -676,7 +929,7 @@ class Orbiter extends Transformer{
 
         //pathArray.push({x: circX, y: circY});
 
-        console.log({r:((radius/iRadius) * 100).toFixed(2) +'%'});
+        //console.log({r:((radius/iRadius) * 100).toFixed(2) +'%'});
 
         if(radius < 0){
           iDirection = iJump/25;
@@ -693,7 +946,7 @@ class Orbiter extends Transformer{
             .attr('style', "stroke:#" + hStroke) 
             .attr('d', oLine(pathArray))
             .transition()
-            .duration(1000) // Duration of the animation in milliseconds
+            .duration(1) // Duration of the animation in milliseconds
             .attr('transform', `rotate(360, ${cX}, ${cY})`);
         }, 0);
     }

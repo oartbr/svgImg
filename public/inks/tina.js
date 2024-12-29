@@ -3,9 +3,7 @@
    Feb 18th 2024
    svimg.insertLayer(sName, sColor, sScale, sFile, aRange, sType, iThickness)
 */
-svimg.insertLayer('ValentinaA', '#00006633', 5, "/img/tinaA.png", [0,5], 'scribbles');
-svimg.insertLayer('ValentinaB', '#00006633', 5, "/img/tinaB.png", [0,10], 'scribbles');
-svimg.insertLayer('ValentinaC', '#00006633', 5, "/img/tinaC.png", [0,20], 'scribbles');
-svimg.insertLayer('ValentinaD', '#00006633', 5, "/img/tinaD.png", [0,20], 'doodles');
-//svimg.insertLayer('ValentinaB', '#00006633', 5, "/img/valB.png", [0,5], 'scribbles');
-//svimg.insertLayer('ValentinaC', '#00006633', 5, "/img/valC.png", [0,20], 'doodles');
+svimg.setDensity(1).createLayer('mapper', "/img/valentinaA.png",  '#FF00FF66', 10, [0,20], 1, 'scribbles').attr('limit', 10).setCenter(411,679);
+svimg.setDensity(1).createLayer('mapper', "/img/valentinaA.png",  '#FFFF0066', 10, [0,20], 1, 'scribbles').attr('limit', 18).setCenter(411,679);
+svimg.setDensity(1).createLayer('mapper', "/img/valentinaA.png",  '#00FFFF66', 10, [0,20], 1, 'scribbles').attr('limit', 20).setCenter(411,679);
+svimg.setDensity(17).createLayer('mapper', "/img/valentinaA.png",  '#00FF0022', 10, [200,1], 8, 'balls').attr('limit',-198).setCenter(411,679);

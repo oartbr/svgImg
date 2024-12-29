@@ -16,7 +16,6 @@ router.use(bodyParser.urlencoded({
     limit: process.env.APP_UPLOAD_LIMIT  || '10mb' // Set limit to 10MB, adjust as needed
   }));
 
-const link = window.location.pathname;
 const project = {
     title: "For the Drawing Machine ",
     subtitle: "This is under development. Nothing to see here.",
@@ -25,8 +24,7 @@ const project = {
     action: '',
     files: [],
     show:'',
-    upload_dir: process.env.APP_UPLOAD_DIR ,
-    currentFile: link.substring(link.lastIndexOf('/')+1)
+    upload_dir: process.env.APP_UPLOAD_DIR
 };
 
 // get an image file from the img folder

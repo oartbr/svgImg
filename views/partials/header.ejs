@@ -20,13 +20,16 @@
         <div class="column">
             <h1><%= title %></h1>
             <p><%= subtitle %></p>
-            <script>
-                svimg.insertButton('Download', ()=>svimg.generateFiles('Download'));
-                svimg.insertButton('Refresh', ()=>svimg.refresh());
-                svimg.insertButton('Reset', ()=>svimg.reset());
-            </script>
+            <div class="layerButtons"></div>
         </div>
         <div class="column">
             <div class="inkName"><%- include('./inks') %></div>
+            <div class="controls">
+                <script>
+                    svimg.insertButton('Download', ()=>svimg.generateDownloads('Download'));
+                    svimg.insertButton('Refresh', ()=>svimg.refresh());
+                    svimg.insertButton('Reset', ()=>svimg.reset());
+                </script>
+            </div>
         </div>
     </header>
