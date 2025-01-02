@@ -160,6 +160,7 @@ window.svimg = (function (){
       },
       addLayerButton(sID, oOwner){
         const oButton = $("<div class='layerButton' id='" + sID + "_control'>" + sID + "</div>");
+        oButton.attr('title', oOwner.colorStroke + " > " + oOwner.type );
         $(".layerButtons").append(oButton);
 
         $(oButton).on("click", function(){
@@ -236,7 +237,7 @@ window.svimg = (function (){
         this.svg[sName].density = this.density || 1;
         this.layer.push({sName, sColor, sScale, sFile, aRange, sType, iThickness});
         this.density = 1;// this resets density for each layer
-        this.addLayerButton(sName, this.svg[sName]);
+        this.addLayerButton(sName, this.svg[sName], this.svg[sName] );
         return this.svg[sName].transformer;
       },
       setDensity(iDens){
@@ -567,6 +568,15 @@ class MapIm extends Transformer{
         .style('stroke', this.colorStroke)
         .style('fill', '#ff000000')
         .attr("stroke-width", this.thickness);
+    }   else if (this.type == 'tortless'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + d.bid + 10 - Math.floor(Math.random() * 20))
+        .attr('y1', d => d.y + 3 - Math.floor(Math.random() * 6))
+        .attr('x2', d => d.x + d.diameter + 10 - Math.floor(Math.random() * 20))
+        .attr('y2', d => d.y + d.diameter + 3 - Math.floor(Math.random() * 6))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness);
     }   else if (this.type == 'swivels'){
       svg.selectAll('swivel').data(swivels).enter().append('line')
         .attr('x1', d => d.x1)
@@ -641,7 +651,10 @@ class Mapper extends Transformer{
   onload() {
     canvas.width = this.width;
     canvas.height = this.height;
+    this.width = 250;
+    this.height = 250;
     ctx.drawImage(this, 0, 0);
+    
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixelData = imageData.data;
     const pixelCount = pixelData.length / 4; // Each pixel has 4 values (R,G,B,A)
@@ -686,7 +699,7 @@ class Mapper extends Transformer{
           const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
           circles.push(circle);
           
-          const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid};
+          const line = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, bid: this.bid, r1: Math.random(), r2: Math.random()};
           lines.push(line);
 
           swivels.push(swivel);
@@ -766,7 +779,27 @@ class Mapper extends Transformer{
         .style('stroke', this.colorStroke)
         .style('fill', '#ff000000')
         .attr("stroke-width", this.thickness);
-    }   else if (this.type == 'swivels'){
+    }   else if (this.type == 'scribblesA'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x )
+        .attr('y1', d => d.y )
+        .attr('x2', d => d.x + (d.diameter/4))
+        .attr('y2', d => d.y + (d.diameter/4))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness)
+        .attr('transform', d => `rotate(${20 - Math.floor(Math.random() * 40)}, ${d.x - (d.diameter/2)}, ${d.y - (d.diameter/2)})`);
+    }  else if (this.type == 'scribblesB'){
+      svg.selectAll('line').data(lines).enter().append('line')
+        .attr('x1', d => d.x + 2 - Math.floor(d.r1 * 2))
+        .attr('y1', d => d.y )
+        .attr('x2', d => d.x + (d.diameter/1) + 2 - Math.floor(d.r1 * 2))
+        .attr('y2', d => d.y + (d.diameter/1))
+        .style('stroke', this.colorStroke)
+        .style('fill', '#ff000000')
+        .attr("stroke-width", this.thickness)
+        .attr('transform', d => `rotate(${25 - Math.floor(Math.random() * 50)}, ${d.x}, ${d.y})`);
+    }  else if (this.type == 'swivels'){
       svg.selectAll('swivel').data(swivels).enter().append('line')
         .attr('x1', d => d.x1)
         .attr('y1', d => d.y1)
@@ -785,8 +818,8 @@ class Mapper extends Transformer{
         .style('fill', '#ff000000')
         .attr("stroke-width", this.thickness);
     } else if (this.type == 'poly'){
-      svg.selectAll('polygon').data(polygon).enter().append('polygon')
-        .attr("d", d3.polygon(6, d.x, d.x, d.diameter))
+      svg.selectAll('circle').data(circles).enter().append('polygon')
+        .attr("d", d => d3.polygon(6, d.x, d.x, d.diameter))
         .style('stroke', this.colorStroke)
         .style('fill', '#ff0000ff')
         .attr("stroke-width", this.thickness);
