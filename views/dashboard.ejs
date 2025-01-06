@@ -1,0 +1,19 @@
+<!-- Include Header -->
+<%- include('./partials/header') %>
+<script>
+    function clearInkName(){
+      $('.inks div').remove();
+      $('.layerButtons').remove();
+    }
+    $(function() { 
+        if(!svimg.getView()){
+          window.location = "/";
+        };
+        clearInkName();
+      });
+</script>
+<div class="main">
+    <%- include('./partials/inks_dashboard') %>
+</div>
+<!-- Include Footer -->
+<%- include('./partials/footer') %>

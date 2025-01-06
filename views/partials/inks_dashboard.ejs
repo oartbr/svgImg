@@ -1,0 +1,23 @@
+<script>
+    function gotoInk(url) {
+        window.location.href = url; 
+    }
+</script>
+<div class="inks_dashboard">
+<% if(files.length > 0){ %>
+
+        
+            <% files.forEach(function(file) { %>
+                <div onClick="gotoInk('./show/<%= file %>')" class="inkThumbnail">
+                  <img src="./thumbnail/<%= file %>.png"/>
+                  <div class="inkName"><%= file %></div>
+                </div>
+            <% }); %>
+            
+
+<%} else {%>
+
+        <div class="alert">No inks to display</div>
+
+<%} %>
+</div>

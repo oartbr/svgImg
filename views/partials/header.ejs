@@ -26,9 +26,11 @@
             <div class="inkName"><%- include('./inks') %></div>
             <div class="controls">
                 <script>
+                    svimg.insertButton('Home', () => window.location.href = '/dashboard');
                     svimg.insertButton('Download', ()=>svimg.generateDownloads('Download'));
                     svimg.insertButton('Refresh', ()=>svimg.refresh());
                     svimg.insertButton('Reset', ()=>svimg.reset());
+                    svimg.insertButton('Save', ()=>svimg.generateThumbnail());
                 </script>
             </div>
         </div>

@@ -24,7 +24,8 @@ const project = {
     action: '',
     files: [],
     show:'',
-    upload_dir: process.env.APP_UPLOAD_DIR
+    upload_dir: process.env.APP_UPLOAD_DIR,
+    thumbnail_dir: process.env.APP_THUMBNAIL_DIR
 };
 
 // get an image file from the img folder
@@ -68,6 +69,19 @@ router.get('/view/:fileName', (req, res) => {
     
 });
 
+// Show a thumbnail 
+router.get('/thumbnail/:fileName', (req, res) => {
+    const fileName = (req.params.fileName != ".js") ? req.params.fileName : "error.js";
+    project['action'] = '/thumbnail';
+    res.sendFile(path.join(__dirname, '../public', `/inks/thumbnails/${fileName}`), (err) => {
+        if (err) {
+            // Handle the error
+            res.status(404).redirect('./error.js');
+        } 
+    });
+    
+});
+
 // Show a picture with filter
 router.get('/show/:fileName', (req, res) => {
     const fileName = req.params.fileName;
@@ -100,6 +114,31 @@ router.get('/show/:fileName', (req, res) => {
 router.get('/show', (req, res) => {
     project['action'] = '/show';
     res.redirect('/');
+});
+
+// Save a file
+router.post('/file/makeThumbnail/:filename', (req, res) => {
+    project['action'] = `/file/makeThumbnail/${req.params.filename}`;
+
+    const fileName = req.params.filename;
+    const thumbnailData = req.body.thumbnail;
+
+    if (!thumbnailData) {
+        res.status(400).send('No thumbnail data provided');
+        return;
+    }
+
+    const buffer = Buffer.from(thumbnailData, 'base64');
+    
+    fs.writeFile(project['thumbnail_dir'] + fileName, buffer, (err) => {
+        if (err) {
+            res.status(500).send('Error saving file');
+            return;
+        }
+
+        res.send(`<a href="${project['thumbnail_dir']}/${fileName}">${fileName}</a>`);
+    });
+    
 });
 
 // Save a file
@@ -162,6 +201,26 @@ router.get('/about', (req, res) => {
 router.get('/user/:username', (req, res) => {
     project['action'] = '/user';
     res.send(`Hello, ${req.params.username}! <br> Now, go away.`);
+});
+
+// Dashboard route
+router.get('/dashboard/', (req, res) => {
+    const directoryPath = project.fileBase + '/public/inks';  // Replace with your directory path
+    project['action'] = '/';
+    fs.readdir(directoryPath, (err, files) => {
+        const aFiles = [];
+        if (err) {
+            files = [];
+            //return console.error('Unable to scan directory: ' + err);
+        } 
+        files.forEach(file => {
+            aFiles.push(file.split(".")[0]);
+        });
+
+        project['files'] = aFiles;
+        res.render('dashboard', project);
+    });
+    
 });
 
 

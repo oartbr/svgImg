@@ -37,12 +37,9 @@ header{
 .inks{
     min-width: 10em;
     max-width: 80%;
-    min-height: 7.7em;
-    float: right;
-    position: absolute;
     top: 1em;
     right: 1.5em;
-    background-color: #eee;
+    font-size: 4rem;
 }
 .inks ul{
     display: flex;
@@ -65,8 +62,9 @@ header{
     position: absolute;
     display: flex;
     flex-direction: row;
-    top: 8.7rem;
+    top: 7.7rem;
     left: 1.5rem;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 .layerButton {
     color: #666;
@@ -86,6 +84,41 @@ header{
 svg.inactive{
     display: none;
 }
+
+.inks_dashboard{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 1em;
+    gap: 20px; /* Add gap between items */
+}
+
+.inkThumbnail{
+    flex: 1 1 calc(16.66% - 20px); /* Adjust width to fit 6 items per row with 20px gap */
+    height: auto;
+    margin: 0; /* Remove margin to use gap instead */
+    
+}
+
+.inkThumbnail img{
+  border: 5px solid #fff;
+}
+
+.inkThumbnail img:hover{
+    border: 5px solid rgb(200, 255, 0);
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.inkName {
+    font-size: 1.2em;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-transform: capitalize;
+    color: #666;
+    vertical-align: bottom;
+    height: 100%;
+}
+
 footer{
     text-align: center;
     color: #999;

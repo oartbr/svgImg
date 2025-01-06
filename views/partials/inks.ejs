@@ -4,13 +4,9 @@
     }
 </script>
 <% if(files.length > 0){ %>
-
-        <select onchange="gotoInk(this.value)" class="inkSelect">
-            <% files.forEach(function(file) { %>
-                <option value="./show/<%= file %>" <%= show == file ? 'selected="selected"' : '' %>><%= file %></option>
-            <% }); %>
-        </select>
-
+    <div class="inks">
+        <div><%= show %></div>
+    </div>
 <%} else {%>
     <div class="inks">
         <div class="alert">No inks to display</div>

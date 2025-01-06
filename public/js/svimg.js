@@ -293,12 +293,13 @@ window.svimg = (function (){
       /*  this gets the layers on the design, includes it on a text and calls the back-end to generate the files to download */
       generateDownloads(sButtonName){
         const sFileName = this.fileName;
-
+        
         this.layer.forEach(layer => {
           
           const oLayer = {}; //  creates the layer that will append all the layers
           oLayer.fileName = layer.sName + ".svg";
           oLayer.id = sFileName;
+          
           const element = $("svg#" + layer.sName);
           const sStroke = $("path", element).css('stroke');
           const sStrokeNoAlpha = this.rgbaToHexA(sStroke).slice(0, -2);
@@ -308,6 +309,7 @@ window.svimg = (function (){
 
           //$(element).prop('width', '100%').prop('height', '100%');
           oLayer.svg += element.prop('outerHTML'); // this includes the svg and the path on a text to be sent to the server
+          
           //console.log(this.makeUnik(), element.prop('outerHTML'));
           if(!element.hasClass("inactive")){ 
             $.post("../file/download/" + oLayer.fileName, oLayer, function(data){
@@ -317,8 +319,66 @@ window.svimg = (function (){
           }
         });
 
+      },
 
+      // this should create a thumbnail for the design, so we can have a dashboard with the latest inks.
+      generateThumbnail(){
+        const element = document.querySelector("svg#" + "my-svg");
+        const sFileName = this.fileName;
+        if (!element) {
+            console.error(`Element svg#${layer.sName} not found`);
+            return;
+        }
+        /*
+        const sStroke = element.querySelector("path").style.stroke;
+        const sStrokeNoAlpha = this.rgbaToHexA(sStroke).slice(0, -2);
 
+        element.querySelectorAll("path").forEach(path => {
+          path.style.stroke = sStrokeNoAlpha; // this removes the transparency from the color of the path because the files can't have any transparency to work on inkscape
+          path.style.stroke = sStroke; // this returns the original color to the path
+        });
+*/
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(element);
+
+        //const  = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.src = "data:image/svg+xml;base64," + btoa(svgString);
+
+        img.onload = function() {
+          const maxWidth = 250;
+          const maxHeight = 250;
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate the aspect ratio
+          const aspectRatio = width / height;
+
+              
+          // Adjust width and height to fit within the 250x250 box
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+                width = maxWidth;
+                height = maxWidth / aspectRatio;
+            } else {
+                height = maxHeight;
+                width = maxHeight * aspectRatio;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          const thumbnail = canvas.toDataURL("image/png").split(',')[1]; // Get base64 part
+      
+          $.post("../file/makeThumbnail/" + sFileName + ".png", { thumbnail }, function(data) {
+              const downloadLink = $(data).addClass("downloadLink");
+              $(`button.${sButtonName}`).after(downloadLink); // this gets the return from the server and creates a link for download.
+              console.log(downloadLink);
+          });
+
+        };
       },
 
       makeUnik(iLength) {
