@@ -731,7 +731,13 @@ class Mapper extends Transformer{
     this.center = this.transformer.center;
     
     const brightnessScale = d3.scaleLinear().domain([255, 0]).range(this.range); // Linear scaling function for brightness to diameter
-    console.log(this.transformer.sId, this.transformer.limit);
+    //console.log(this.transformer.sId, this.transformer.limit);
+    
+    if(typeof this.transformer.limit == 'number'){
+      this.transformer.limit = [0, this.transformer.limit];
+    } else if (typeof this.transformer.limit == 'undefined'){
+      this.transformer.limit = [0, this.range[0]];
+    }
     for (let i = 0; i < pixelCount; i++) {
         const R = pixelData[i * 4]; // Red value of pixel i
         const G = pixelData[i * 4 + 1]; // Green value of pixel i
@@ -752,8 +758,8 @@ class Mapper extends Transformer{
         direction = this.transformer.findDirection(x*this.svgScale, y*this.svgScale, this.center.x, this.center.y);
         swivel = this.transformer.traceSwivel(x*this.svgScale + 3 - Math.floor(Math.random() * 6), y*this.svgScale + 3 - Math.floor(Math.random() * 6), direction, diameter);
 
-        
-        const hasLimit = (this.transformer.limit) ? diameter > (this.range[1] - this.transformer.limit) : true;
+        //console.log({diameter, range: this.range[1], limit: this.transformer.limit, max: diameter > (this.range[1] - this.transformer.limit[1]), min: diameter < (this.range[1] - this.transformer.limit[0])});
+        const hasLimit = (this.transformer.limit) ? diameter >= this.transformer.limit[0] && diameter <= this.transformer.limit[1] : true;
 
         if (diameter > 1 && countDensity % density == 0 && hasLimit) {
           const circle = { x: x*this.svgScale, y: y*this.svgScale, diameter: diameter, pixelData: pixelData[i]};
