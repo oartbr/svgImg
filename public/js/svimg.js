@@ -308,7 +308,7 @@ window.svimg = (function (){
           $("path", element).css('stroke', sStroke); // this returns the original color to the path
 
           //$(element).prop('width', '100%').prop('height', '100%');
-          oLayer.svg += element.prop('outerHTML'); // this includes the svg and the path on a text to be sent to the server
+          oLayer.svg += element.html(); // this only includes the content of the path on a text to be sent to the server
           
           //console.log(this.makeUnik(), element.prop('outerHTML'));
           if(!element.hasClass("inactive")){ 
